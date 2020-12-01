@@ -7,7 +7,7 @@ var db = new sqlite3.Database('nodemcu');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 db.serialize(function() {
-  db.run("CREATE TABLE IF NOT EXISTS task(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,status TEXT)");
+  db.run("CREATE TABLE IF NOT EXISTS task(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,button TEXT,status TEXT)");
 });
 
 
@@ -30,10 +30,11 @@ app.post('/command',(req, res) => {
     try {
         var data = {
             name: req.body.name,
+            button: req.body.button,
             status: "notcompleted"
         }
-        var sql = 'INSERT INTO task(name,status) VALUES(?,?)'
-        var params = [data.name,data.status]
+        var sql = 'INSERT INTO task(name,button,status) VALUES(?,?,?)'
+        var params = [data.name,data.button,data.status]
         db.run(sql, params, function (err, result) {
             if (err){
                 res.status(400).json({"error": err.message})
@@ -57,6 +58,7 @@ app.patch("/api/:id", (req, res, next) => {
     console.log(req.body.status);
     var data = {
         name: req.body.name,
+        button: req.body.button,
         status: req.body.status
     }
     db.run(
